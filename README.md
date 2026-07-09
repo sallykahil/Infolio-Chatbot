@@ -1,4 +1,4 @@
-# AskMyBiz — RAG Chatbot for Small Businesses
+# Infolio — RAG Chatbot for Small Businesses
 
 Multi-tenant RAG bot. Each business gets their own isolated knowledge base.
 Upload PDFs or a website URL → customers ask questions → answers come from YOUR data only.
@@ -60,6 +60,8 @@ Open `frontend/dashboard.html` in your browser (or serve via ASP.NET).
 | POST | `/ingest-url` | Scrape and index a URL |
 | POST | `/ask` | Ask a question |
 | GET  | `/tenants` | List all businesses |
+| Delete  | `/tenants` | delete chosen business|
+
 
 ---
 
