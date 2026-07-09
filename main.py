@@ -1,5 +1,5 @@
 """
-AskMyBiz RAG API
+infolio RAG API
 Multi-tenant RAG backend for small businesses.
 Endpoints: /upload-docs, /ingest-url, /ask, /tenants
 Compatible with langchain 1.x + langchain-qdrant
@@ -43,7 +43,7 @@ QDRANT_API_KEY = os.getenv("QDRANT_API_KEY", None)
 EMBED_MODEL    = os.getenv("EMBED_MODEL", "all-MiniLM-L6-v2")
 TOP_K          = int(os.getenv("TOP_K", "3"))
 
-app = FastAPI(title="AskMyBiz RAG API", version="2.0")
+app = FastAPI(title="infolio RAG API", version="2.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -161,7 +161,7 @@ class AskResponse(BaseModel):
 # ─────────────────────────────────────────────
 @app.get("/")
 def root():
-    return {"status": "AskMyBiz API running ✓"}
+    return {"status": "infolio RAG API running ✓"}
 
 
 @app.post("/upload-docs")
