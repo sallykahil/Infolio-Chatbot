@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Infolio — Business Knowledge Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F5F8FF;--surface:#FFF;--s2:#EEF3FC;--s3:#E3EAFA;
+  --border:#D6E2F5;--b2:#C2D3EE;
+  --accent:#2F7BEE;--a2:#5B9BF5;--abg:#EBF2FE;
+  --teal:#0EA5A0;--tbg:#E6F7F7;
+  --ok:#16A34A;--okbg:#DCFCE7;
+  --err:#DC2626;--errbg:#FEE2E2;
+  --text:#0F1C35;--t2:#3D5278;--muted:#7A91B8;
+  --r:10px;--sw:258px;--ease:cubic-bezier(.4,0,.2,1);
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;overflow:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:10px}
+
+/* ── SIDEBAR ── */
+.sb{width:var(--sw);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;flex-shrink:0;position:sticky;top:0}
+.sb-head{padding:22px 18px 16px;border-bottom:1px solid var(--border)}
+.logo{display:flex;align-items:center;gap:9px;margin-bottom:2px}
+.lmark{width:30px;height:30px;background:linear-gradient(135deg,var(--accent),var(--teal));border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:.75rem;font-weight:800;color:#fff;flex-shrink:0}
+.ltext{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.15rem;font-weight:800;color:var(--text);letter-spacing:-.3px}
+.ltag{font-size:.65rem;color:var(--muted);font-weight:500;letter-spacing:.04em;margin-left:39px}
+.sb-nav{padding:12px 10px;flex:1;display:flex;flex-direction:column;gap:1px;overflow-y:auto}
+.nl{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:10px 10px 4px}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:.82rem;font-weight:500;color:var(--t2);transition:all .15s var(--ease);position:relative;user-select:none}
+.ni:hover{background:var(--s2);color:var(--text)}
+.ni.on{background:var(--abg);color:var(--accent);font-weight:600}
+.ni.on::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:16px;background:var(--accent);border-radius:0 3px 3px 0}
+.ni-ico{font-size:.9rem;width:16px;text-align:center;opacity:.8}
+.sb-foot{padding:12px 14px;border-top:1px solid var(--border)}
+.biz-chip{background:var(--abg);border:1px solid var(--border);border-radius:8px;padding:9px 11px}
+.bc-lbl{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:3px}
+.bc-val{font-size:.79rem;font-weight:700;color:var(--accent)}
+.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--muted);margin-right:5px;vertical-align:middle}
+.dot.on{background:var(--ok);box-shadow:0 0 5px var(--ok)}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;height:100vh;display:flex;flex-direction:column;background:var(--bg)}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 30px;height:54px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:10}
+.tb-l{display:flex;flex-direction:column}
+.tb-title{font-size:.875rem;font-weight:700;color:var(--text)}
+.tb-sub{font-size:.7rem;color:var(--muted);margin-top:1px}
+.api-badge{display:flex;align-items:center;gap:6px;font-size:.71rem;font-weight:600;color:var(--muted);background:var(--s2);border:1px solid var(--border);border-radius:20px;padding:4px 10px}
+.content{padding:26px 30px;flex:1;display:flex;flex-direction:column;gap:18px}
+
+/* ── PAGES ── */
+.page{display:none;flex-direction:column;gap:16px}
+.page.on{display:flex}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px}
+.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.ct{display:flex;align-items:center;gap:8px;font-size:.855rem;font-weight:700;color:var(--text)}
+.ci{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.78rem}
+.ci-b{background:var(--abg)}.ci-t{background:var(--tbg)}.ci-g{background:var(--okbg)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+
+/* Stats */
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;position:relative;overflow:hidden}
+.sbar{position:absolute;top:0;left:0;right:0;height:3px}
+.sbar.b{background:linear-gradient(90deg,var(--accent),var(--a2))}
+.sbar.t{background:linear-gradient(90deg,var(--teal),#2DD4BF)}
+.sbar.g{background:linear-gradient(90deg,var(--ok),#4ADE80)}
+.slbl{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:7px}
+.sval{font-size:1.6rem;font-weight:800;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;line-height:1}
+.ssub{font-size:.7rem;color:var(--muted);margin-top:4px}
+
+/* Forms */
+label,.lbl{font-size:.72rem;font-weight:600;color:var(--t2);display:block;margin-bottom:5px}
+input[type=text],input[type=url],select,textarea{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:7px;padding:8px 11px;color:var(--text);font-family:'Inter',sans-serif;font-size:.83rem;outline:none;transition:all .15s var(--ease)}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(47,123,238,.1);background:#fff}
+select{cursor:pointer}
+.row{display:flex;gap:8px;align-items:flex-end}
+.row input,.row select{flex:1}
+.divider{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin:10px 0}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 15px;border-radius:7px;border:none;font-size:.81rem;font-weight:600;cursor:pointer;transition:all .15s var(--ease);font-family:'Inter',sans-serif;white-space:nowrap}
+.btn:hover{transform:translateY(-1px)}.btn:active{transform:translateY(0)}
+.btn-p{background:var(--accent);color:#fff;box-shadow:0 1px 5px rgba(47,123,238,.25)}
+.btn-p:hover{background:#1d6be0;box-shadow:0 3px 12px rgba(47,123,238,.35)}
+.btn-t{background:var(--teal);color:#fff}
+.btn-t:hover{background:#0c9490}
+.btn-o{background:#fff;border:1.5px solid var(--b2);color:var(--t2)}
+.btn-o:hover{border-color:var(--accent);color:var(--accent);background:var(--abg)}
+.btn-gh{background:transparent;color:var(--muted)}
+.btn-gh:hover{background:var(--s2);color:var(--text)}
+.btn-sm{padding:5px 11px;font-size:.76rem}
+.btn-fw{width:100%;justify-content:center}
+
+/* Dropzone */
+.dz{border:2px dashed var(--b2);border-radius:9px;padding:24px;text-align:center;cursor:pointer;transition:all .15s var(--ease);color:var(--muted);font-size:.81rem;background:var(--s2)}
+.dz:hover,.dz.ov{border-color:var(--accent);background:var(--abg);color:var(--accent)}
+.dz-ico{font-size:1.6rem;margin-bottom:6px}
+.dz-hint{font-size:.69rem;color:var(--muted);margin-top:3px}
+#fi{display:none}
+
+/* Business cards */
+.biz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.biz-card{background:var(--s2);border:1.5px solid var(--border);border-radius:9px;padding:13px;transition:all .15s var(--ease);cursor:default}
+.biz-card:hover{border-color:var(--b2)}
+.biz-card.act{border-color:var(--accent);background:var(--abg)}
+.biz-name{font-size:.82rem;font-weight:700;color:var(--text);margin-bottom:8px}
+.biz-actions{display:flex;gap:5px;flex-wrap:wrap}
+
+/* Steps banner */
+.steps{display:flex;align-items:center;gap:0;margin-bottom:4px}
+.step{display:flex;align-items:center;gap:7px;font-size:.78rem;font-weight:600;color:var(--muted);padding:8px 14px;border-radius:7px;transition:all .15s}
+.step.done{color:var(--ok)}
+.step.cur{color:var(--accent);background:var(--abg)}
+.step-num{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:800;background:var(--s3);color:var(--muted);flex-shrink:0}
+.step.done .step-num{background:var(--okbg);color:var(--ok)}
+.step.cur  .step-num{background:var(--accent);color:#fff}
+.step-arrow{color:var(--border);font-size:.8rem;margin:0 2px}
+
+/* Chat */
+.chat-shell{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;height:430px}
+.chat-top{background:var(--s2);border-bottom:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;gap:8px;font-size:.79rem;font-weight:600;color:var(--t2);flex-shrink:0}
+.cav-sm{width:22px;height:22px;background:linear-gradient(135deg,var(--accent),var(--teal));border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:800;color:#fff}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:11px;background:var(--bg)}
+.msg{display:flex;gap:7px;align-items:flex-start;animation:fu .18s ease}
+@keyframes fu{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.mav{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:800;flex-shrink:0}
+.msg.bot .mav{background:linear-gradient(135deg,var(--accent),var(--teal));color:#fff}
+.msg.usr .mav{background:var(--text);color:#fff}
+.msg.usr{flex-direction:row-reverse}
+.mbub{border-radius:9px;padding:8px 11px;font-size:.81rem;line-height:1.6;max-width:78%}
+.msg.bot .mbub{background:var(--surface);border:1px solid var(--border);color:var(--text)}
+.msg.usr .mbub{background:var(--accent);color:#fff}
+.typing span{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--muted);margin:0 1.5px;animation:bl 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+@keyframes bl{0%,80%,100%{opacity:.2}40%{opacity:1}}
+.chat-foot{border-top:1px solid var(--border);padding:10px 13px;display:flex;gap:8px;background:var(--surface);flex-shrink:0}
+.chat-foot input{flex:1;margin:0}
+
+/* Pills */
+.pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:100px;font-size:.68rem;font-weight:700}
+.p-b{background:var(--abg);color:var(--accent)}
+.p-g{background:var(--okbg);color:var(--ok)}
+.p-t{background:var(--tbg);color:var(--teal)}
+.p-r{background:var(--errbg);color:var(--err)}
+
+/* Logs */
+.log-list{display:flex;flex-direction:column;gap:6px}
+.li{display:flex;justify-content:space-between;align-items:center;background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-size:.79rem;transition:border-color .15s}
+.li:hover{border-color:var(--b2)}
+.lq{color:var(--text);font-weight:500}
+.lt{color:var(--muted);font-size:.69rem;font-family:monospace}
+.empty{text-align:center;padding:26px;color:var(--muted);font-size:.81rem}
+.eico{font-size:1.7rem;margin-bottom:7px;opacity:.35}
+
+/* Code */
+.code{background:var(--text);border-radius:8px;padding:14px;font-family:'Courier New',monospace;font-size:.76rem;color:#7DD3FC;white-space:pre;overflow-x:auto;line-height:1.75}
+
+/* Post-action CTA */
+.cta-box{background:var(--okbg);border:1px solid #BBF7D0;border-radius:9px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.cta-msg{font-size:.81rem;font-weight:600;color:var(--ok)}
+
+/* Widget preview */
+.prev-wrap{height:360px;border:1px solid var(--border);border-radius:9px;background:var(--s2);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+
+/* Toast */
+#toast{position:fixed;bottom:22px;right:22px;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 15px;font-size:.81rem;font-weight:500;color:var(--text);box-shadow:0 8px 28px rgba(15,28,53,.12);transform:translateY(60px);opacity:0;transition:all .25s var(--ease);z-index:999;display:flex;align-items:center;gap:8px;max-width:290px}
+#toast.show{transform:translateY(0);opacity:1}
+#toast.ok{border-left:3px solid var(--ok)}
+#toast.err{border-left:3px solid var(--err)}
+#toast.info{border-left:3px solid var(--accent)}
+
+@media(max-width:820px){.g2,.g3{grid-template-columns:1fr}.sb{display:none}.content{padding:16px 14px}.topbar{padding:0 14px}}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sb">
+  <div class="sb-head">
+    <div class="logo">
+      <div class="lmark">In</div>
+      <span class="ltext">Infolio</span>
+    </div>
+    <div class="ltag">Business Knowledge Platform</div>
+  </div>
+  <nav class="sb-nav">
+    <div class="nl">Workspace</div>
+    <div class="ni on"  onclick="go('overview',this)"><span class="ni-ico">⊞</span> Overview</div>
+    <div class="ni"     onclick="go('setup',this)">  <span class="ni-ico">＋</span> New Business</div>
+    <div class="nl" style="margin-top:6px">Assistant</div>
+    <div class="ni"     onclick="go('test',this)">   <span class="ni-ico">💬</span> Test Chat</div>
+    <div class="ni"     onclick="go('embed',this)">  <span class="ni-ico">⟨/⟩</span> Embed Widget</div>
+    <div class="ni"     onclick="go('logs',this)">   <span class="ni-ico">≡</span> Query Logs</div>
+  </nav>
+  <div class="sb-foot">
+    <div class="biz-chip">
+      <div class="bc-lbl">Active Business</div>
+      <div class="bc-val"><span class="dot" id="sdot"></span><span id="sname">None</span></div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="tb-l">
+      <div class="tb-title" id="ttl">Overview</div>
+      <div class="tb-sub"   id="tsu">All your businesses at a glance</div>
+    </div>
+    <div class="api-badge"><span class="dot" id="adot"></span><span id="ast">Checking…</span></div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══ OVERVIEW ══ -->
+    <div class="page on" id="page-overview">
+      <div class="g3">
+        <div class="stat"><div class="sbar b"></div><div class="slbl">Businesses</div><div class="sval" id="sc-biz">—</div><div class="ssub">Knowledge bases</div></div>
+        <div class="stat"><div class="sbar t"></div><div class="slbl">Queries Today</div><div class="sval" id="sc-q">0</div><div class="ssub">Questions answered</div></div>
+        <div class="stat"><div class="sbar g"></div><div class="slbl">API</div><div class="sval" id="sc-api" style="font-size:.95rem;padding-top:4px">—</div><div class="ssub">Backend status</div></div>
+      </div>
+
+      <div class="card">
+        <div class="ch">
+          <div class="ct"><div class="ci ci-b">🏪</div> Your Businesses</div>
+          <button class="btn btn-p btn-sm" onclick="go('setup',document.querySelectorAll('.ni')[1])">＋ New Business</button>
+        </div>
+        <div class="biz-grid" id="biz-grid">
+          <div class="empty"><div class="eico">🏪</div>No businesses yet.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SETUP WIZARD ══ -->
+    <div class="page" id="page-setup">
+
+      <!-- Step progress -->
+      <div class="card" style="padding:14px 18px">
+        <div class="steps" id="steps">
+          <div class="step cur" id="st1"><div class="step-num">1</div> Name Business</div>
+          <span class="step-arrow">›</span>
+          <div class="step" id="st2"><div class="step-num">2</div> Add Data</div>
+          <span class="step-arrow">›</span>
+          <div class="step" id="st3"><div class="step-num">3</div> Test & Deploy</div>
+        </div>
+      </div>
+
+      <!-- Step 1: Name -->
+      <div id="step-1">
+        <div class="card">
+          <div class="ch"><div class="ct"><div class="ci ci-b">🏪</div> Step 1 — Name Your Business</div></div>
+
+          <!-- Existing businesses — shown when API has tenants -->
+          <div id="existing-wrap" style="display:none;margin-bottom:4px">
+            <div class="lbl">Select existing business</div>
+            <div class="row" style="margin-bottom:0">
+              <select id="existing" onchange="pickExisting()" style="font-weight:600">
+                <option value="">— pick a business —</option>
+              </select>
+              <button class="btn btn-p" onclick="pickExisting()">Activate →</button>
+            </div>
+            <div class="divider">or create new</div>
+          </div>
+
+          <!-- New business input -->
+          <div class="lbl">New Business ID <span style="font-weight:400;color:var(--muted)">(no spaces)</span></div>
+          <div class="row">
+            <input type="text" id="tid" placeholder="e.g. sallycrochet · myrestaurant · clinicabc" maxlength="40"
+              onkeydown="if(event.key==='Enter')activateBiz()"/>
+            <button class="btn btn-p" onclick="activateBiz()">Create →</button>
+          </div>
+          <div id="tid-status" style="margin-top:9px;font-size:.76rem;color:var(--muted)">Enter a short unique ID for this business — no spaces.</div>
+        </div>
+      </div>
+
+      <!-- Step 2: Add Data (hidden until step 1 done) -->
+      <div id="step-2" style="display:none">
+        <div class="cta-box" style="margin-bottom:4px">
+          <div class="cta-msg">✓ Business "<span id="active-biz-name"></span>" activated — now add its knowledge</div>
+          <button class="btn btn-sm btn-o" onclick="goStep(1)">← Change</button>
+        </div>
+
+        <div class="g2">
+          <div class="card">
+            <div class="ch"><div class="ct"><div class="ci ci-b">📄</div> Upload PDFs</div></div>
+            <div class="dz" id="dz" onclick="document.getElementById('fi').click()">
+              <div class="dz-ico">📂</div>
+              <div>Click or drag PDFs here</div>
+              <div class="dz-hint">Price lists · Menus · FAQs · Manuals</div>
+            </div>
+            <input type="file" id="fi" multiple accept=".pdf"/>
+            <div id="flist" style="margin-top:8px;font-size:.76rem;color:var(--t2)"></div>
+            <button class="btn btn-p btn-fw" style="margin-top:11px" onclick="uploadDocs()">↑ Upload & Index</button>
+          </div>
+
+          <div class="card">
+            <div class="ch"><div class="ct"><div class="ci ci-t">🌐</div> Add Website URL</div></div>
+            <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px;line-height:1.6">Paste any page — Infolio reads it and makes it searchable instantly.</p>
+            <div style="margin-bottom:10px">
+              <label>URL</label>
+              <input type="url" id="url-in" placeholder="https://yourbusiness.com/about"/>
+            </div>
+            <button class="btn btn-t btn-fw" onclick="ingestURL()">🔗 Fetch & Index</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="ch"><div class="ct"><div class="ci ci-g">✓</div> Indexed Sources</div></div>
+          <div class="log-list" id="idx-log">
+            <div class="empty"><div class="eico">📭</div>Nothing indexed yet.</div>
+          </div>
+        </div>
+
+        <!-- Step 2 → 3 CTA (appears after first index) -->
+        <div id="step2-cta" style="display:none">
+          <div class="cta-box">
+            <div class="cta-msg">✓ Data indexed — ready to test the assistant!</div>
+            <button class="btn btn-p" onclick="goStep(3)">Test Assistant →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Test & Deploy -->
+      <div id="step-3" style="display:none">
+        <div class="cta-box" style="margin-bottom:4px">
+          <div class="cta-msg">✓ Testing "<span id="active-biz-name2"></span>" assistant</div>
+          <button class="btn btn-sm btn-o" onclick="goStep(2)">← Add More Data</button>
+        </div>
+
+        <div class="chat-shell">
+          <div class="chat-top">
+            <div class="cav-sm">In</div>
+            Infolio Assistant
+            <span class="pill p-g" style="margin-left:auto">● Live</span>
+            <span class="pill p-b" id="chat-biz-badge" style="margin-left:6px"></span>
+          </div>
+          <div class="chat-msgs" id="chat-box">
+            <div class="msg bot">
+              <div class="mav">In</div>
+              <div class="mbub">Hi! I'm ready. Ask me anything about this business's products, services, or policies.</div>
+            </div>
+          </div>
+          <div class="chat-foot">
+            <input type="text" id="chat-in" placeholder="Ask a question…" onkeydown="if(event.key==='Enter')send()"/>
+            <button class="btn btn-p" onclick="send()">Send →</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="ch"><div class="ct"><div class="ci ci-b">⟨/⟩</div> Embed on Client Website</div>
+            <button class="btn btn-sm btn-o" onclick="copyEmbed()">📋 Copy Code</button>
+          </div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:10px">
+            Give this snippet to your client. They paste it before <code style="background:var(--s2);padding:1px 5px;border-radius:4px;color:var(--accent)">&lt;/body&gt;</code> and the chat bubble appears on their site.
+          </p>
+          <div class="code" id="embed-code"><!-- Activate a business first --></div>
+          <div class="prev-wrap" id="wprev" style="margin-top:14px">
+            <div class="empty"><div class="eico">💬</div>Widget preview will appear here</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TEST CHAT (standalone) ══ -->
+    <div class="page" id="page-test">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="ch" style="padding:13px 18px;margin:0;border-bottom:1px solid var(--border)">
+          <div class="ct"><div class="ci ci-b">💬</div> Assistant Preview</div>
+          <span class="pill p-g" id="test-badge">No business active</span>
+        </div>
+        <div class="chat-shell" style="border:none;border-radius:0;height:460px">
+          <div class="chat-top">
+            <div class="cav-sm">In</div>
+            Infolio Assistant
+            <span class="pill p-g" style="margin-left:auto">● Live</span>
+          </div>
+          <div class="chat-msgs" id="chat-box2">
+            <div class="msg bot">
+              <div class="mav">In</div>
+              <div class="mbub">Hello! Activate a business in Overview, then ask me anything about it.</div>
+            </div>
+          </div>
+          <div class="chat-foot">
+            <input type="text" id="chat-in2" placeholder="Ask a question…" onkeydown="if(event.key==='Enter')send2()"/>
+            <button class="btn btn-p" onclick="send2()">Send →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ EMBED ══ -->
+    <div class="page" id="page-embed">
+      <div class="card">
+        <div class="ch">
+          <div class="ct"><div class="ci ci-b">⟨/⟩</div> What is the Embed Widget?</div>
+        </div>
+        <div style="font-size:.82rem;color:var(--t2);line-height:1.75;margin-bottom:16px">
+          The embed widget is a <strong>floating chat bubble</strong> that appears on your client's website.<br>
+          After you build their bot, you give them <strong>one line of code</strong> to paste on their site.<br>
+          Their customers then see a "💬 Ask Us" button — they click it, a chat window opens, and Infolio answers from the business's documents automatically.
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:.78rem;color:var(--t2)">① You upload client's PDFs / website</div>
+          <span style="color:var(--muted)">→</span>
+          <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:.78rem;color:var(--t2)">② You copy the embed code</div>
+          <span style="color:var(--muted)">→</span>
+          <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:.78rem;color:var(--t2)">③ Client pastes it on their site</div>
+          <span style="color:var(--muted)">→</span>
+          <div style="background:var(--okbg);border:1px solid #BBF7D0;border-radius:8px;padding:10px 14px;font-size:.78rem;color:var(--ok);font-weight:600">✓ Bot is live!</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="ch">
+          <div class="ct"><div class="ci ci-b">📋</div> Your Embed Code</div>
+          <button class="btn btn-sm btn-o" onclick="copyEmbed()">📋 Copy</button>
+        </div>
+        <div id="embed-status" style="font-size:.78rem;color:var(--muted);margin-bottom:10px">
+          Activate a business first to generate your embed code.
+        </div>
+        <div class="code" id="embed-code2"><!-- No active business --></div>
+      </div>
+
+      <div class="card">
+        <div class="ch"><div class="ct"><div class="ci ci-t">🎨</div> Widget Preview</div></div>
+        <div class="prev-wrap" id="wprev2">
+          <div class="empty"><div class="eico">💬</div>Activate a business to preview</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ LOGS ══ -->
+    <div class="page" id="page-logs">
+      <div class="card">
+        <div class="ch">
+          <div class="ct"><div class="ci ci-b">≡</div> Query Log</div>
+          <button class="btn btn-gh btn-sm" onclick="clearLogs()">Clear</button>
+        </div>
+        <div class="log-list" id="qlogs">
+          <div class="empty"><div class="eico">📊</div>No queries yet this session.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = "http://localhost:8000";
+let TID = "", qlogs = [], ilogs = [], sessions = 0, curStep = 1;
+
+const META = {
+  overview:['Overview',        'All your businesses at a glance'],
+  setup:   ['New Business',    'Create & configure a business bot in 3 steps'],
+  test:    ['Test Assistant',  'Preview the customer chat experience'],
+  embed:   ['Embed Widget',    'The chat bubble that lives on your client\'s website'],
+  logs:    ['Query Logs',      'Questions answered this session'],
+};
+
+// ── Navigation ──
+function go(name, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('on'));
+  document.getElementById('page-' + name).classList.add('on');
+  if (el) el.classList.add('on');
+  document.getElementById('ttl').textContent = META[name][0];
+  document.getElementById('tsu').textContent = META[name][1];
+  loadTenants(); // always refresh on any nav
+}
+
+// ── Toast ──
+function toast(msg, type='ok') {
+  const t = document.getElementById('toast');
+  const ico = {ok:'✓',err:'✕',info:'ℹ'};
+  t.innerHTML = `<span>${ico[type]}</span><span>${msg}</span>`;
+  t.className = 'show ' + type;
+  setTimeout(() => t.className='', 3200);
+}
+
+// ── API check ──
+async function checkAPI() {
+  try {
+    const r = await fetch(`${API}/`);
+    if (r.ok) {
+      document.getElementById('adot').classList.add('on');
+      document.getElementById('ast').textContent = 'Connected';
+      document.getElementById('sc-api').innerHTML = '<span style="color:var(--ok);font-weight:800">● Online</span>';
+    }
+  } catch {
+    document.getElementById('ast').textContent = 'Offline';
+    document.getElementById('sc-api').innerHTML = '<span style="color:var(--err);font-weight:800">● Offline</span>';
+  }
+}
+
+// ── Load tenants ──
+async function loadTenants() {
+  try {
+    const r = await fetch(`${API}/tenants`);
+    const d = await r.json();
+    document.getElementById('sc-biz').textContent = d.count || 0;
+
+    // Dropdown in setup wizard
+    const sel = document.getElementById('existing');
+    const prev = sel.value;
+    sel.innerHTML = `<option value="">— choose existing —</option>` +
+      (d.tenants||[]).map(t=>`<option value="${t}"${t===prev?' selected':''}>${t}</option>`).join('');
+    document.getElementById('existing-wrap').style.display = d.tenants?.length ? 'block':'none';
+
+    // Business cards in overview
+    renderBizCards(d.tenants || []);
+  } catch {}
+}
+
+function renderBizCards(tenants) {
+  const el = document.getElementById('biz-grid');
+  if (!tenants.length) {
+    el.innerHTML = '<div class="empty"><div class="eico">🏪</div>No businesses yet. Click "+ New Business" to start.</div>';
+    return;
+  }
+  el.innerHTML = tenants.map(t => `
+    <div class="biz-card ${t===TID?'act':''}">
+      <div class="biz-name"><span class="dot ${t===TID?'on':''}"></span>${t}</div>
+      <div class="biz-actions">
+        <button class="btn btn-sm ${t===TID?'btn-p':'btn-o'}" onclick="selectBiz('${t}')">
+          ${t===TID?'✓ Active':'Activate'}
+        </button>
+        <button class="btn btn-sm btn-o" onclick="selectBizAndData('${t}')">↑ Add Data</button>
+      </div>
+    </div>`).join('');
+}
+
+function selectBiz(id) {
+  setActive(id);
+  loadTenants();
+  toast(`"${id}" activated`, 'ok');
+}
+
+function selectBizAndData(id) {
+  setActive(id);
+  goStep(2);
+  go('setup', document.querySelectorAll('.ni')[1]);
+}
+
+function pickExisting() {
+  const v = document.getElementById('existing').value;
+  if (!v) return toast('Select a business from the list', 'err');
+  setActive(v);
+  goStep(2);
+  loadTenants();
+  toast(`"${v}" activated — add more data or test it`, 'ok');
+}
+
+// ── Activate business (Step 1) ──
+async function activateBiz() {
+  const v = document.getElementById('tid').value.trim().replace(/\s+/g,'_');
+  if (!v) return toast('Enter a Business ID', 'err');
+  setActive(v);
+  await loadTenants();    // ← instant refresh, no page reload needed
+  goStep(2);
+  toast(`"${v}" activated — add its data below`, 'ok');
+}
+
+function setActive(id) {
+  TID = id;
+  document.getElementById('sname').textContent = TID;
+  document.getElementById('sdot').classList.add('on');
+  document.getElementById('tid-status').innerHTML = `<span class="pill p-g">✓ Active: ${TID}</span>`;
+  document.getElementById('active-biz-name').textContent  = TID;
+  document.getElementById('active-biz-name2').textContent = TID;
+  document.getElementById('chat-biz-badge').textContent   = TID;
+  document.getElementById('test-badge').textContent       = TID;
+  document.getElementById('test-badge').className         = 'pill p-g';
+  updateEmbed();
+}
+
+// ── Wizard step navigation ──
+function goStep(n) {
+  curStep = n;
+  [1,2,3].forEach(i => {
+    document.getElementById(`step-${i}`).style.display = i===n ? 'block':'none';
+    const s = document.getElementById(`st${i}`);
+    s.className = 'step ' + (i<n?'done':i===n?'cur':'');
+  });
+}
+
+// ── File drop ──
+const dz = document.getElementById('dz');
+const fi = document.getElementById('fi');
+dz.addEventListener('dragover',  e=>{e.preventDefault();dz.classList.add('ov')});
+dz.addEventListener('dragleave', ()=>dz.classList.remove('ov'));
+dz.addEventListener('drop', e=>{e.preventDefault();dz.classList.remove('ov');fi.files=e.dataTransfer.files;showFiles()});
+fi.addEventListener('change', showFiles);
+function showFiles() {
+  document.getElementById('flist').innerHTML =
+    [...fi.files].map(f=>`<div style="padding:2px 0">📄 ${f.name}</div>`).join('');
+}
+
+// ── Upload PDFs ──
+async function uploadDocs() {
+  if (!TID) return toast('Activate a business first', 'err');
+  if (!fi.files.length) return toast('Select at least one PDF', 'err');
+  const form = new FormData();
+  [...fi.files].forEach(f=>form.append('files',f));
+  toast('Uploading & indexing…','info');
+  try {
+    const r = await fetch(`${API}/upload-docs?tenant_id=${TID}`,{method:'POST',body:form});
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail||'Failed');
+    addIlog(`📄 ${d.files} file(s) — ${d.chunks_indexed} chunks indexed`);
+    document.getElementById('flist').innerHTML = '';
+    document.getElementById('step2-cta').style.display = 'block';
+    toast(`✓ Indexed ${d.chunks_indexed} chunks`, 'ok');
+  } catch(e) { toast(e.message,'err'); }
+}
+
+// ── Ingest URL ──
+async function ingestURL() {
+  if (!TID) return toast('Activate a business first','err');
+  const url = document.getElementById('url-in').value.trim();
+  if (!url) return toast('Enter a URL','err');
+  toast('Fetching page…','info');
+  try {
+    const r = await fetch(`${API}/ingest-url`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({tenant_id:TID,url})
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail||'Failed');
+    addIlog(`🌐 ${url} — ${d.chunks_indexed} chunks indexed`);
+    document.getElementById('url-in').value = '';
+    document.getElementById('step2-cta').style.display = 'block';
+    toast(`✓ Indexed ${d.chunks_indexed} chunks`,'ok');
+  } catch(e) { toast(e.message,'err'); }
+}
+
+function addIlog(msg) {
+  ilogs.unshift({msg, t:new Date().toLocaleTimeString()});
+  document.getElementById('idx-log').innerHTML = ilogs.map(l=>
+    `<div class="li"><span class="lq">${l.msg}</span><span class="lt">${l.t}</span></div>`
+  ).join('');
+}
+
+// ── Chat (wizard step 3) ──
+async function send() { await _send('chat-in','chat-box'); }
+async function send2() { await _send('chat-in2','chat-box2'); }
+
+async function _send(inputId, boxId) {
+  if (!TID) return toast('Activate a business first','err');
+  const inp = document.getElementById(inputId);
+  const q   = inp.value.trim();
+  if (!q) return;
+  inp.value = '';
+  _addMsg(boxId,'usr',q);
+  const tid = 'th-'+Date.now();
+  _addThink(boxId,tid);
+  try {
+    const r = await fetch(`${API}/ask`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({tenant_id:TID,question:q})
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail||'Error');
+    _replaceThink(tid, d.answer);
+    addQlog(q);
+    sessions++;
+    document.getElementById('sc-q').textContent = sessions;
+  } catch(e) { _replaceThink(tid,'⚠ '+e.message); }
+}
+
+function _addMsg(box,role,text){
+  const b=document.getElementById(box);
+  const d=document.createElement('div');
+  d.className=`msg ${role}`;
+  d.innerHTML=`<div class="mav">${role==='usr'?'You':'In'}</div><div class="mbub">${text}</div>`;
+  b.appendChild(d);b.scrollTop=b.scrollHeight;
+}
+function _addThink(box,id){
+  const b=document.getElementById(box);
+  const d=document.createElement('div');
+  d.className='msg bot';d.id=id;
+  d.innerHTML=`<div class="mav">In</div><div class="mbub"><div class="typing"><span></span><span></span><span></span></div></div>`;
+  b.appendChild(d);b.scrollTop=b.scrollHeight;
+}
+function _replaceThink(id,text){
+  const el=document.getElementById(id);
+  if(el) el.querySelector('.mbub').textContent=text;
+}
+
+function addQlog(q){
+  qlogs.unshift({q,t:new Date().toLocaleTimeString()});
+  document.getElementById('qlogs').innerHTML=qlogs.map(l=>
+    `<div class="li"><span class="lq">${l.q}</span><span class="lt">${l.t}</span></div>`
+  ).join('');
+}
+function clearLogs(){
+  qlogs=[];
+  document.getElementById('qlogs').innerHTML='<div class="empty"><div class="eico">📊</div>Logs cleared.</div>';
+}
+
+// ── Embed ──
+function updateEmbed(){
+  const code=`<script src="${API}/widget.js"\n  data-tenant="${TID}"\n  data-api="${API}"\n  data-title="Ask Us Anything"\n  data-brand="Infolio">\n<\/script>`;
+  const el1 = document.getElementById('embed-code');
+  const el2 = document.getElementById('embed-code2');
+  if(el1) el1.textContent = code;
+  if(el2) el2.textContent = code;
+  const st = document.getElementById('embed-status');
+  if(st) st.textContent = `Embed code for business: ${TID}`;
+  renderWidget('wprev');
+  renderWidget('wprev2');
+}
+
+function copyEmbed(){
+  const code = document.getElementById('embed-code2')?.textContent || document.getElementById('embed-code')?.textContent;
+  navigator.clipboard.writeText(code||'');
+  toast('Embed code copied!','ok');
+}
+
+function renderWidget(id){
+  const el=document.getElementById(id);
+  if(!el||!TID) return;
+  el.innerHTML=`
+    <div style="position:absolute;bottom:16px;right:16px;width:290px;background:#fff;
+      border:1px solid #D6E2F5;border-radius:12px;overflow:hidden;font-family:Inter,sans-serif;
+      box-shadow:0 10px 36px rgba(15,28,53,.13)">
+      <div style="background:linear-gradient(135deg,#2F7BEE,#0EA5A0);padding:11px 14px;
+        display:flex;align-items:center;gap:8px">
+        <div style="width:22px;height:22px;background:rgba(255,255,255,.2);border-radius:5px;
+          display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:800;color:#fff">In</div>
+        <span style="color:#fff;font-weight:700;font-size:.81rem">Ask Us Anything</span>
+        <span style="margin-left:auto;color:rgba(255,255,255,.5);cursor:pointer;font-size:.9rem">✕</span>
+      </div>
+      <div style="padding:12px;min-height:80px;font-size:.77rem;color:#3D5278;line-height:1.65;background:#F5F8FF">
+        Hi! I can answer questions about products, services, and policies. How can I help?
+      </div>
+      <div style="display:flex;gap:6px;padding:8px 10px;border-top:1px solid #D6E2F5;background:#fff">
+        <input style="flex:1;background:#F5F8FF;border:1.5px solid #D6E2F5;border-radius:6px;
+          padding:6px 9px;color:#0F1C35;font-size:.74rem;outline:none" placeholder="Type your question…"/>
+        <button style="background:#2F7BEE;border:none;color:#fff;border-radius:6px;
+          padding:6px 10px;cursor:pointer;font-size:.73rem;font-weight:600">Send</button>
+      </div>
+    </div>
+    <div style="position:absolute;bottom:16px;right:320px;background:linear-gradient(135deg,#2F7BEE,#0EA5A0);
+      width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+      font-size:1.1rem;cursor:pointer;box-shadow:0 4px 14px rgba(47,123,238,.4)">💬</div>`;
+}
+
+window.addEventListener('DOMContentLoaded', async ()=>{
+  goStep(1);
+  await checkAPI();
+  await loadTenants();          // always runs on load
+  setInterval(loadTenants, 6000); // auto-refresh every 6s
+});
+</script>
+</body>
+</html>
