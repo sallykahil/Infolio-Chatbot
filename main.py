@@ -7,6 +7,7 @@ Compatible with langchain 1.x + langchain-qdrant
 
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import os, shutil, tempfile
 
@@ -162,6 +163,11 @@ class AskResponse(BaseModel):
 @app.get("/")
 def root():
     return {"status": "infolio RAG API running ✓"}
+
+
+@app.get("/dashboard")
+def dashboard():
+    return FileResponse(os.path.join(os.path.dirname(__file__), "dashboard.html"))
 
 
 @app.post("/upload-docs")
