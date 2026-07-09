@@ -453,7 +453,7 @@ select{cursor:pointer}
 
 <div id="toast"></div>
 
-<script>
+<script> 
 const API = "https://web-production-9963e.up.railway.app";
 let TID = "", qlogs = [], ilogs = [], sessions = 0, curStep = 1;
 
@@ -533,6 +533,7 @@ function renderBizCards(tenants) {
           ${t===TID?'✓ Active':'Activate'}
         </button>
         <button class="btn btn-sm btn-o" onclick="selectBizAndData('${t}')">↑ Add Data</button>
+        <button class="btn btn-sm btn-o" style="color:var(--err);border-color:var(--err)" onclick="deleteBiz('${t}')">🗑 Delete</button>
       </div>
     </div>`).join('');
 }
@@ -547,6 +548,29 @@ function selectBizAndData(id) {
   setActive(id);
   goStep(2);
   go('setup', document.querySelectorAll('.ni')[1]);
+}
+
+async function deleteBiz(id) {
+  if (!confirm(`Delete "${id}" and all its indexed data? This cannot be undone.`)) return;
+  try {
+    const r = await fetch(`${API}/tenants/${id}`, { method: 'DELETE' });
+    if (!r.ok) throw new Error();
+    if (TID === id) {
+      TID = '';
+      document.getElementById('sname').textContent = '';
+      document.getElementById('sdot').classList.remove('on');
+      document.getElementById('tid-status').innerHTML = '';
+      document.getElementById('active-biz-name').textContent  = '';
+      document.getElementById('active-biz-name2').textContent = '';
+      document.getElementById('chat-biz-badge').textContent   = '';
+      document.getElementById('test-badge').textContent       = '';
+      document.getElementById('test-badge').className         = 'pill';
+    }
+    loadTenants();
+    toast(`"${id}" deleted`, 'ok');
+  } catch {
+    toast(`Could not delete "${id}"`, 'err');
+  }
 }
 
 function pickExisting() {
