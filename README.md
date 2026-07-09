@@ -5,29 +5,44 @@ Upload PDFs or a website URL → customers ask questions → answers come from Y
 
 ---
 
-## Stack
-- **Backend**: FastAPI + LangChain + Qdrant + Groq (Llama 3)
-- **Embeddings**: HuggingFace all-MiniLM-L6-v2 (free, runs locally)
-- **Frontend**: HTML/CSS/JS dashboard (plug into ASP.NET easily)
+## Live URLs
+
+- **API**: https://web-production-9963e.up.railway.app
+- **Dashboard**: https://web-production-9963e.up.railway.app/dashboard
+
+Both are served by the same Railway service — pushing to `main` redeploys them together.
 
 ---
 
-## Setup in 5 Steps
+## Stack
+- **Backend**: FastAPI + LangChain + Qdrant + Groq (Llama 3)
+- **Embeddings**: HuggingFace all-MiniLM-L6-v2 (free, runs locally)
+- **Frontend**: `dashboard.html` — plain HTML/CSS/JS, served by FastAPI via `GET /dashboard`
+- **Hosting**: Railway (single service, auto-deploys from GitHub `main`)
+- **Vector DB**: Qdrant Cloud
+
+---
+
+## Local Development
 
 ### 1. Get your free API keys
 - **Groq** (LLM): https://console.groq.com → free, fast Llama 3
 - **Qdrant Cloud** (vector DB): https://cloud.qdrant.io → free 1GB cluster
+  - Use a **Database API key** with Manage access for the cluster (not a
+    collection-restricted key — it needs to list/create/delete collections).
 
 ### 2. Set environment variables
+Create a `.env` file (gitignored) in the project root:
 ```bash
-export GROQ_API_KEY="your-groq-key"
-export QDRANT_URL="https://your-cluster.qdrant.io"
-export QDRANT_API_KEY="your-qdrant-key"
+GROQ_API_KEY=your-groq-key
+QDRANT_URL=https://your-cluster.qdrant.io
+QDRANT_API_KEY=your-qdrant-key
+EMBED_MODEL=all-MiniLM-L6-v2
+TOP_K=3
 ```
 
 ### 3. Install dependencies
 ```bash
-cd api
 pip install -r requirements.txt
 ```
 
@@ -36,9 +51,17 @@ pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
 ```
 API docs at: http://localhost:8000/docs
+Dashboard at: http://localhost:8000/dashboard
 
-### 5. Open the dashboard
-Open `frontend/dashboard.html` in your browser (or serve via ASP.NET).
+---
+
+## Deploying to Railway
+
+1. Push to `main` on GitHub — Railway auto-builds and redeploys the connected service.
+2. In Railway → your service → **Variables**, set the same env vars as above
+   (`GROQ_API_KEY`, `QDRANT_URL`, `QDRANT_API_KEY`, `EMBED_MODEL`, `TOP_K`).
+   Railway does not read your local `.env` — these must be set in the dashboard.
+3. Deploys typically take 1–3 minutes. Once **Active**, the service stays running continuously.
 
 ---
 
@@ -49,6 +72,7 @@ Open `frontend/dashboard.html` in your browser (or serve via ASP.NET).
 3. Or paste their website URL
 4. Go to **Test Bot** → ask questions → verify it works
 5. Go to **Embed** → copy the JS snippet → paste on their site
+6. Use **Delete** on a business card to remove a tenant and its indexed data
 
 ---
 
@@ -56,12 +80,12 @@ Open `frontend/dashboard.html` in your browser (or serve via ASP.NET).
 
 | Method | Endpoint | What it does |
 |--------|----------|-------------|
+| GET  | `/dashboard` | Serves the dashboard UI |
 | POST | `/upload-docs?tenant_id=X` | Upload PDF files |
 | POST | `/ingest-url` | Scrape and index a URL |
 | POST | `/ask` | Ask a question |
 | GET  | `/tenants` | List all businesses |
-| Delete  | `/tenants` | delete chosen business|
-
+| DELETE | `/tenants/{tenant_id}` | Delete a business and its indexed data |
 
 ---
 
@@ -76,5 +100,4 @@ Open `frontend/dashboard.html` in your browser (or serve via ASP.NET).
 - [ ] Add Stripe for subscriptions
 - [ ] Add auth (JWT per tenant)
 - [ ] Build widget.js (embeddable chat bubble)
-- [ ] Deploy API to Railway/Render
 - [ ] Build ASP.NET wrapper around the dashboard
