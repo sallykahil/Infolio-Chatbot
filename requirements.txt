@@ -1,8 +1,10 @@
+# API
 fastapi==0.111.0
 uvicorn==0.29.0
 python-multipart==0.0.9
 python-dotenv==1.0.1
 
+<<<<<<< HEAD
 # RAG stack
 langchain>=0.3.0,<0.4.0
 langchain-community>=0.3.0,<0.4.0
@@ -11,9 +13,19 @@ langchain-groq>=0.2.0,<0.4.0
 langchain-huggingface>=0.1.0,<0.2.0
 langchain-qdrant>=0.2.0,<0.3.0
 langchain-text-splitters>=0.3.0,<0.4.0
+=======
+# LangChain
+langchain>=0.3.0,<0.4.0
+langchain-core>=0.3.0,<0.4.0
+langchain-community>=0.3.0,<0.4.0
+langchain-text-splitters>=0.3.0,<0.4.0
+langchain-groq>=0.2.0,<0.4.0
+langchain-huggingface>=0.1.0,<0.2.0
+langchain-qdrant>=0.2.0,<0.3.0
+>>>>>>> 434ec2b (fix: qdrant-client version conflict)
 
-# Vector store
-qdrant-client==1.9.1
+# Vector store — must be >=1.10.1 for langchain-qdrant
+qdrant-client>=1.10.1,<2.0.0
 
 # Embeddings
 sentence-transformers==3.0.0
@@ -21,4 +33,4 @@ sentence-transformers==3.0.0
 # Document loaders
 pdfplumber==0.11.1
 beautifulsoup4==4.12.3
-requests
+requests>=2.32.0
