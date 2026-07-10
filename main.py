@@ -44,7 +44,7 @@ QDRANT_API_KEY = os.getenv("QDRANT_API_KEY", None)
 EMBED_MODEL    = os.getenv("EMBED_MODEL", "all-MiniLM-L6-v2")
 TOP_K          = int(os.getenv("TOP_K", "3"))
 
-app = FastAPI(title="infolio RAG API", version="2.0")
+app = FastAPI(title="Infolio RAG API", version="2.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -162,12 +162,20 @@ class AskResponse(BaseModel):
 # ─────────────────────────────────────────────
 @app.get("/")
 def root():
-    return {"status": "infolio RAG API running ✓"}
+    return {"status": "Infolio RAG API running ✓"}
 
 
 @app.get("/dashboard")
 def dashboard():
     return FileResponse(os.path.join(os.path.dirname(__file__), "dashboard.html"))
+
+
+@app.get("/widget.js")
+def widget():
+    return FileResponse(
+        os.path.join(os.path.dirname(__file__), "widget.js"),
+        media_type="application/javascript",
+    )
 
 
 @app.post("/upload-docs")
@@ -226,4 +234,14 @@ def list_tenants():
         for c in qdrant_client.get_collections().collections
         if c.name.startswith("biz_")
     ]
-    return {"tenants": collections, "count": len(collections)} 
+    return {"tenants": collections, "count": len(collections)}
+
+
+@app.delete("/tenants/{tenant_id}")
+def delete_tenant(tenant_id: str):
+    collection_name = f"biz_{tenant_id}"
+    existing = [c.name for c in qdrant_client.get_collections().collections]
+    if collection_name not in existing:
+        raise HTTPException(404, f"Tenant '{tenant_id}' not found")
+    qdrant_client.delete_collection(collection_name)
+    return {"deleted": tenant_id}

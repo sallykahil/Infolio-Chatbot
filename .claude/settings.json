@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(artifact-design)",
+      "Skill(artifact-design:*)",
+      "Bash(curl -s -m 20 --ssl-no-revoke https://web-production-9963e.up.railway.app/docs -o /dev/null -w \"docs:%{http_code}\\\\n\")",
+      "Bash(curl -s -m 20 --ssl-no-revoke https://web-production-9963e.up.railway.app/openapi.json)",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\([p for p in d['paths'] if 'tenant' in p]\\)\")"
+    ]
+  }
+}
